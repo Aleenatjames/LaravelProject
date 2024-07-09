@@ -11,6 +11,7 @@
         "hardevine/shoppingcart": "^3.3",
         "laravel/framework": "^11.9",
         "laravel/socialite": "^5.15",
+        "laravel/telescope": "^5.1",
         "laravel/tinker": "^2.9"
     },
     "require-dev": {
