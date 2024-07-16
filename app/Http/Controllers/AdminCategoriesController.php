@@ -33,11 +33,9 @@ class AdminCategoriesController extends Controller
     
         // Step 2: Fetch product details using the ordered product IDs
         $products = Product::whereIn('id', $orderedProductIds)
-            ->get()
-            ->sortBy(function($product) use ($orderedProductIds) {
-                return array_search($product->id, $orderedProductIds);
-            });
-    
+        ->orderByRaw('FIELD(id, ' . implode(',', $orderedProductIds) . ')')
+        ->get();
+        
         // Initialize arrays to store category products and pinned products
         $categoryProducts = [];
         $categoryPins = [];

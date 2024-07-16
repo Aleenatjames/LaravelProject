@@ -20,7 +20,7 @@
                 </div>
             </div>
             @endif
-            <div class="col-md-10">
+            <div class="col-md-12">
                 <div class="card borde-0 shadow-1g my-4">
                     <div class="card-header bg-dark">
                         <h3 class="text-white">Products</h3>
@@ -36,6 +36,7 @@
                                 <th>Price</th>
                                 <th>Category</th>
                                 <th>Descrption</th>
+                                <th>Estimated Delivery</th>
                                 <th>Created at</th>
                                 <th>Action</th>
                             </tr>
@@ -49,6 +50,7 @@
                                 <td>{{$product->price}}</td>
                                 <td>{{$product->category}}</td>
                                 <td>{{$product->description}}</td>
+                                <td>{{$product->estimated_delivery}}</td>
                                 <td>{{ \Carbon\Carbon::parse($product->created_at)->format('d M,Y')}}</td>
                                 <td>
                                 <a href="{{route('product.edit',$product->id)}}" class="btn btn-dark">Edit</a>

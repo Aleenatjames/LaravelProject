@@ -24,8 +24,9 @@ class ProductController extends Controller
         $validateData= $request->validate([
               'name'=>'required',
               'price'=>'required',
-              'category'=>'required',
+              'category' => 'required',
               'description'=>'required',
+              'estimated_delivery'=>'required',
               'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
               
           ]);
@@ -34,8 +35,9 @@ class ProductController extends Controller
        $product=new Product();
        $product->name=$validateData['name'];
        $product->price=$validateData['price'];
-       $product->category=$validateData['category'];
+       $product->category = $validateData['category'];
        $product->description=$validateData['description'];
+       $product->estimated_delivery=$validateData['estimated_delivery'];
     
 
        $image=$validateData['image'];
@@ -47,17 +49,20 @@ class ProductController extends Controller
 
        $product->image=$imageName;
        $product->save();
-      
-       $product->categories()->sync($validateData['categories']);
        
-        return redirect()->route('product.index')->with('success','Product added successfully');
+        return redirect()->route('options.create',[
+            'productId'=>$product->id,
+        ])->with('success','Product added successfully');
   
        
       }
       public function edit($id){
-        $product = Product::findOrFail($id);
-        return view('product.edit',[
-        'products' =>$product
+        $product = Product::with('options.values')->findOrFail($id);
+        Log::info('Product Options:', ['options' => $product->options]);
+    
+        return view('product.edit', [
+            'products' => $product,
+            'options' => $product->options
         ]);
       }
       public function update($id, Request $request){
@@ -67,7 +72,8 @@ class ProductController extends Controller
             'name' => 'required',
             'price' => 'required',
             'category' => 'required',
-            'description' => 'required'
+            'description' => 'required',
+            'estimated_delivery' => 'required'
             // // 'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
     
@@ -76,6 +82,7 @@ class ProductController extends Controller
         $product->price = $validateData['price'];
         $product->category = $validateData['category'];
         $product->description = $validateData['description'];
+        $product->estimated_delivery = $validateData['estimated_delivery'];
     
 
         // if ($request->hasFile('image')) {

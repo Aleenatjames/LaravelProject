@@ -22,7 +22,9 @@ class Category extends Model
     use HasFactory;
 
     public function products()
-{
-    return $this->belongsToMany(Product::class, 'product_category', 'category_id', 'product_id')->withPivot('pinned', 'position');
-}
+    {
+        return $this->belongsToMany(Product::class, 'product_category')
+                    ->withPivot('position', 'pinned')
+                    ->withTimestamps();
+    }
 }

@@ -138,9 +138,9 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="{{route('shipping.create')}}"><i class="fa-solid fa-truck-fast"></i>
               <span data-feather="layers"></span>
-              Integrations
+              Shipping
             </a>
           </li>
         </ul>

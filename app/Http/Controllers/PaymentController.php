@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Mail\OrderConfirmationMail;
+use App\Models\Address;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Country;
 use App\Models\Customer;
 use App\Models\GiftCard;
 use App\Models\OrderCard;
@@ -13,6 +15,7 @@ use Illuminate\Http\Request;
 use App\Models\Orders;
 use App\Models\Payment;
 use App\Models\Product;
+use App\Models\Shipping;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -27,7 +30,9 @@ class PaymentController extends Controller
         $customerId = Auth::guard('customer')->id();
         $code = $request->input('code'); // Retrieve the gift card code from the request
         $address = $request->input('address'); // Retrieve the address from the request
-        
+        $countries=Country::get();
+        $data['countries']=$countries;
+
         Log::info("Customer ID: " . $customerId); // Log the customer ID
         Log::info("Gift Card Code: " . $code); // Log the gift card code received from the request
         Log::info("Address: " . json_encode($address)); // Log the address details
@@ -40,7 +45,11 @@ class PaymentController extends Controller
         foreach ($cartItems as $cartItem) {
             $subtotal += $cartItem->price * $cartItem->quantity;
         }
-        
+        foreach ($cartItems as $cartItem) {
+            $estimatedDeliveryDays = $cartItem->product->estimated_delivery;
+            $cartItem->estimated_delivery_date = now()->addDays($estimatedDeliveryDays)->toDateString();
+        }
+    
         // Check if a gift card code is provided
         
             // Retrieve the gift card using the code
@@ -57,12 +66,17 @@ class PaymentController extends Controller
    
         // Calculate total amount including shipping
         $total = $subtotal + $shipping;
-        
-        return view('front.paay', compact('cartItems', 'subtotal', 'shipping', 'total', 'giftCard', 'address'));
+        $address = Address::where('customer_id', $customerId)->first();
+        Log::info("Address: " . json_encode($address));
+        $shippingCharges = Shipping::where('country_id', $address->country_id)->first();
+    
+    // Set default shipping
+    $shippingCharges = Shipping::where('country_id', $address->country_id)->get();
+    if ($shippingCharges->isEmpty()) {
+        $shippingCharges = Shipping::where('country_id', 'rest_of_world')->get();
     }
-    
-    
-
+        return view('front.paay', compact('cartItems', 'subtotal', 'shipping', 'total', 'giftCard', 'address','countries','shippingCharges'));
+    }
 public function successpayment(Request $request)
 {
     DB::beginTransaction(); // Start a database transaction
@@ -109,11 +123,15 @@ public function successpayment(Request $request)
             $giftCardAmount += $orderCard->amount;
         }
     }
-
-    // Calculate total price
-    $total = max(0, $subtotal - $giftCardAmount + $shipping); // Ensure total is not negative
-
-       
+  // Calculate total price
+  $totalAmount = $request->input('total_amount');
+  $shippingAmount = $request->input('shipping_amount');
+  $selectedShippingOption =$request->input('shipping_option_selected');
+  $delivery_date =$request->input('delivery_date');
+  Log::info("TOTAL AMOUNT: " . $totalAmount);
+  Log::info("SHIPPING AMOUNT: " . $shippingAmount);
+  Log::info("SHIPPING option: " . $selectedShippingOption);
+  Log::info("Delivery date: " . $delivery_date);
         // Validate the status field for Orders
         $request->validate([
             'status' => 'required|in:Pending,Processing,Shipped,Delivered,Cancelled', // Define your status options for Orders
@@ -124,7 +142,9 @@ public function successpayment(Request $request)
         $order->customer_name = $customer->name; // Assuming 'name' is a field in customers table
         $order->customer_address = $customerAddress;
         $order->quantity = $totalQuantity;
-        $order->total_amount = $total;
+        $order->total_amount = $totalAmount;
+        $order->shipping_option=$selectedShippingOption;
+        $order->delivery_date=$delivery_date;
         $order->status = $request->input('status'); // Assign status from form input
         $giftCardsUsed = 'not_used'; // Flag to indicate if gift cards were used
 
@@ -146,6 +166,7 @@ public function successpayment(Request $request)
             $orderitem->product_id=$cartItem->product_id;    
             $orderitem->product_name=$cartItem->name;
             $orderitem->qty=$cartItem->quantity;
+            $orderitem->option=$cartItem->option;
             $orderitem->price=$cartItem->price;
             $product = Product::find($cartItem->product_id);
             $productType = $product->name === 'gift card' ? 'gift_card' : 'regular';

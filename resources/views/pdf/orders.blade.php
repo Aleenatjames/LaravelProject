@@ -20,13 +20,14 @@
                     <p>Customer Address: {{ $order->customer_address }}</p>
                     <p>Status: {{ $order->status }}</p>
                     <p>Total Amount: ${{ $order->total_amount }}</p>
+                    <p>Delivery Date: {{ $order->delivery_date}}</p>
+                    <p>Shipping Option: {{ $order->shipping_option }}</p>
 
                     <h5>Products:</h5>
                     <table class="table table-striped">
                         <thead>
                             <tr>
                                 <th>Product Name</th>
-                             
                                 <th>Quantity</th>
                                 <th>Price</th>
                                 <th>Subtotal</th>
@@ -34,9 +35,24 @@
                         </thead>
                         <tbody>
                         @foreach($orderItems as $item)
+                    @php
+        
+                 $options = json_decode($item->option, true);
+                      @endphp
                             <tr>
-                                <td>{{ $item->product->name }}</td>
-                               
+                                <td>{{ $item->product->name }}
+                                @if(!empty($options['size']))
+                <strong>Size:</strong> {{ $options['size'] }}<br>
+            @endif
+            @if(!empty($options['color']))
+                <strong>Color:</strong> {{ $options['color'] }}
+                <div class="color-box" style="background-color: {{ $options['color'] }}; width: 20px; height: 20px; display: inline-block;"></div>
+                <br>
+            @endif
+            @if(!empty($options['flavor']))
+                <strong>Flavor:</strong> {{ $options['flavor'] }}<br>
+            @endif
+                                </td>
                                 <td>{{ $item->qty }}</td>
                                 <td>${{ $item->price }}</td>
                                 <td>${{ $item->price * $item->qty }}</td>

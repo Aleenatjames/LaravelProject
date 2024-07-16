@@ -15,7 +15,7 @@ class Orders extends Model
         'customer_address',
         'customer_id',
         'customer_name',
-        'status'
+        'delivery_date'
         
      
     ];

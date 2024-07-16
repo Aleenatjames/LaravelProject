@@ -39,5 +39,11 @@ return [
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => 'http://127.0.0.1:8000/auth/google/call-back',
     ],
+    'recaptcha' => [
+        'v3' => [
+            'site_key' => env('RECAPTCHA_V3_SITE_KEY'),
+            'secret_key' => env('RECAPTCHA_V3_SECRET_KEY'),
+        ],
+    ],
 
 ];

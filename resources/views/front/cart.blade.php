@@ -21,9 +21,28 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($cartItems as $cartItem)
-                                <tr>
-                                    <td>{{ $cartItem->name }}</td>
+                        @foreach($cartItems as $cartItem)
+    @php
+        // Decode the JSON string into an associative array
+        $options = json_decode($cartItem->option, true);
+    @endphp
+    <tr>
+        <td>
+            {{ $cartItem->name }}<br>
+            
+            <!-- Display options if they are not null -->
+            @if(!empty($options['size']))
+                <strong>Size:</strong> {{ $options['size'] }}<br>
+            @endif
+            @if(!empty($options['color']))
+                <strong>Color:</strong> {{ $options['color'] }}
+                <div class="color-box" style="background-color: {{ $options['color'] }}; width: 20px; height: 20px; display: inline-block;"></div>
+                <br>
+            @endif
+            @if(!empty($options['flavor']))
+                <strong>Flavor:</strong> {{ $options['flavor'] }}<br>
+            @endif
+        </td>
                                     <td><img width="50" src="{{ asset('uploads/products/' . $cartItem->image) }}"></td>
                                     <td>${{ $cartItem->price }}</td>
                                     <td>
@@ -88,7 +107,7 @@
                 <div class="card-body">
                     @php
                         $subtotal = 0;
-                        $shipping = 20; // Assuming fixed shipping cost
+                        
                     @endphp
 
                     @foreach($cartItems as $cartItem)
@@ -106,12 +125,11 @@
                         <div id="subtotal">${{ number_format($subtotal, 2) }}</div>
                     </div>
                     <div class="d-flex justify-content-between pb-2">
-                        <div>Shipping</div>
-                        <div id="shipping">${{ isset($giftCard) ? 0 : $shipping }}</div>
+                        
                     </div>
                     <div class="d-flex justify-content-between summery-end">
                         <div>Total</div>
-                        <div id="total">${{ number_format($subtotal + (isset($giftCard) ? 0 : $shipping), 2) }}</div>
+                        <div id="total">${{ number_format($subtotal + (isset($giftCard)===0), 2) }}</div>
                     </div>
                     <div class="pt-5">
                         <form action="{{ route('front.address') }}" method="GET">

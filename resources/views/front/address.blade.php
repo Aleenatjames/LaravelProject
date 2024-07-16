@@ -73,6 +73,7 @@
                                 <label for="inputCity">City</label>
                                 <input type="text" name="city" class="form-control" id="inputCity">
                             </div>
+                           
                             <div class="form-group col-md-4">
                                 <label for="inputState">State</label>
                                 <select id="inputState" name="state" class="form-control">
@@ -82,7 +83,16 @@
                                     <!-- Add your state options here -->
                                 </select>
                             </div>
-                            <div class="form-group col-md-2">
+                            <div class="col-sm-4">
+        <label for="inputCountry">Country</label>
+        <select name="country" id="country" class="form-control">
+            <option>Select a Country</option>
+            @foreach($countries as $country)
+                <option value="{{ $country->id }}" {{ $address && $address->country_id == $country->id ? 'selected' : '' }}>{{ $country->name }}</option>
+            @endforeach
+        </select>
+    </div>
+                            <div class="form-group col-md-3">
                                 <label for="inputZip">PinCode</label>
                                 <input type="text" name="pincode" class="form-control" id="inputZip">
                             </div>

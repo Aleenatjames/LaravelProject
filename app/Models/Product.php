@@ -8,11 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     protected $table = 'product';
-    protected $fillable = [
-        'name',
-        'price',
-        
-    ];
+    protected $fillable = ['name', 'price', 'description', 'image','estimated_delivery'];
+   
     use HasFactory;
   
    
@@ -21,13 +18,17 @@ class Product extends Model
         return $this->belongsToMany(Orders::class, 'order_product', 'product_id', 'order_id');
     }
     public function categories()
-    {
-        
+    { 
     return $this->belongsToMany(Category::class, 'product_category')
     ->withPivot('position')
     ->orderBy('product_category.position', 'ASC');
     }
+    
     public function product_ratings(){
         return $this->hasMany(ProductRating::class)->where('status',1);
+    }
+    public function options()
+    {
+        return $this->hasMany(Option::class);
     }
 }

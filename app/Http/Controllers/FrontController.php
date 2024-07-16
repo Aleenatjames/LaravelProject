@@ -6,8 +6,10 @@ use App\Models\Cart;
 use App\Models\Category;
 use App\Models\Customer;
 use App\Models\GiftCard;
+use App\Models\Option;
 use App\Models\Orders;
 use App\Models\Product;
+use App\Models\ProductOptionValue;
 use App\Models\ProductRating;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
@@ -88,12 +90,23 @@ class FrontController extends Controller
         // Redirect to the cart page with success message
         return redirect()->route('front.cart')->with('success', 'Product added to cart successfully');
     }
-   public function 
-   updatedetail($id)
+   public function updatedetail($id)
 {
    $products = Product:: withCount('product_ratings')
                         ->withSum('product_ratings','rating')
                         ->with('product_ratings')->find($id);
+     $category = $products->category;
+     $options = Option::where('product_id', $id)->get();
+     
+     $additionalImages = [];
+     $directory = public_path('uploads/products/' . $category);
+ 
+     if (is_dir($directory)) {
+         $files = glob($directory . '/*.*');
+         foreach ($files as $file) {
+             $additionalImages[] = 'uploads/products/' . $category . '/' . basename($file);
+         }
+     }
       $avgRating ='0.00';
       $avgRatingPer=0;
       if($products->product_ratings_count>0){
@@ -107,7 +120,9 @@ class FrontController extends Controller
       'products' => $products,
       'customer'=>$customer,
       'avgRating'=>$avgRating,
-      'avgRatingPer'=>$avgRatingPer
+      'avgRatingPer'=>$avgRatingPer,
+      'additionalImages'=>$additionalImages,
+      'options' => $options,
   ]);
        
 }
@@ -115,42 +130,78 @@ class FrontController extends Controller
    // FrontController.php
 
    public function addTo(Request $request, $id)
-   {
-       $product = Product::findOrFail($id);
-       $customer = Auth::guard('customer')->user();
-       if (Auth::guard('customer')->check()) {
-        $customerId = Auth::guard('customer')->id();
-        logger('Customer ID: ' . $customerId);
-    } else {
+{
+    $product = Product::findOrFail($id);
+    $customer = Auth::guard('customer')->user();
+
+    if (!$customer) {
         return redirect()->route('customer.login')->with('error', 'You must be logged in to add items to the cart');
     }
-   
-       $cartItem = Cart::where('customer_id', $customerId)
-                       ->where('name', $product->name)
-                       ->first();
-        $productType = $product->name === 'Gift Card' ? 'gift_card' : 'regular';
-   
-       if ($cartItem) {
-           $cartItem->quantity += 1;
-           $cartItem->save();
-       } else {
-           Cart::create([
-               'customer_id' => $customerId,
-               'product_id'=>$product->id,
-               'name' => $product->name,
-               'image' => $product->image,
-               'price' => $product->price,
-               'quantity' => 1,
-               'product_type' => $productType,
-           ]);
-       }
-       
-       $cartItems = Cart::where('customer_id', $customerId)->get();
-   
-       // Pass cart items to the cart view and show success message
-       return view('front.cart', compact('cartItems','customer'))->with('success', 'Product added to cart successfully');
-   }
 
+    $customerId = $customer->id;
+
+    $selectedOptions = [
+        'size' => $request->input('selectedSize'),
+        'color' => $request->input('selectedColor'),
+        'flavor' => $request->input('selectedFlavor'),
+    ];
+
+    // Fetch the price from the product_option_values table based on selected options
+    $totalPrice = $product->price;
+
+    // Fetch all options for the product
+    $options = Option::where('product_id', $product->id)->get();
+
+    foreach ($options as $option) {
+        foreach ($selectedOptions as $option->type => $optionValue) {
+            if (!empty($optionValue) && $option->type === $option->type) {
+                $optionValueModel = ProductOptionValue::where('option_id', $option->id)
+                                                      ->where('value', $optionValue)
+                                                      ->first();
+
+                if ($optionValueModel) {
+                    // Add the price of the selected option to the total price
+                    $totalPrice += $optionValueModel->price;
+                }
+            }
+        }
+    }
+    // Serialize the options array into a JSON string
+    $serializedOptions = json_encode($selectedOptions);
+
+    Log::info('Selected Options: ' . $serializedOptions);
+
+    // Check if the cart item with the same product and options exists
+    $cartItem = Cart::where('customer_id', $customerId)
+                    ->where('product_id', $product->id)
+                    ->where('option', $serializedOptions)
+                    ->first();
+
+    $productType = $product->name === 'Gift Card' ? 'gift_card' : 'regular';
+
+    if ($cartItem) {
+        $cartItem->quantity += 1;
+        $cartItem->save();
+    } else {
+        Cart::create([
+            'customer_id' => $customerId,
+            'product_id' => $product->id,
+            'name' => $product->name,
+            'image' => $product->image,
+            'price' => $totalPrice, // Use the fetched price
+            'quantity' => 1,
+            'product_type' => $productType,
+            'option' => $serializedOptions,
+        ]);
+    }
+
+    $cartItems = Cart::where('customer_id', $customerId)->get();
+
+    // Pass cart items to the cart view and show success message
+    return view('front.cart', compact('cartItems', 'customer'))->with('success', 'Product added to cart successfully');
+}
+
+   
 public function cart()
 {
     $customerId = Auth::guard('customer')->id(); // Get the authenticated customer's ID
@@ -194,7 +245,7 @@ public function account()
     $customerAddress = '';
 
     if ($customer->address) {
-        $customerAddress = $customer->address->address1 . ', ' . $customer->address->address2 . ', ' . $customer->address->city . ', ' . $customer->address->state;
+        $customerAddress = $customer->address->address1 . ', ' . $customer->address->address2 . ', ' . $customer->address->city . ', ' . $customer->address->state . ', ' . $customer->address->country;
     }
 
     return view('front.account', compact('customerAddress', 'customer', 'orders'));

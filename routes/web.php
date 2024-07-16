@@ -12,8 +12,10 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\GiftCardController;
 use App\Http\Controllers\GoogleController;
+use App\Http\Controllers\OptionController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PdfController;
+use App\Http\Controllers\ShippingController;
 use App\Models\Customer;
 use Illuminate\Support\Facades\Mail;
 
@@ -48,6 +50,8 @@ Route::get('/cart/address',[AddressController::class,'address'])->name('front.ad
 
 Route::post('/cart/address',[AddressController::class,'store'])->name('front.address.store');
 Route::post('/cart/address/save',[AddressController::class,'saveAddress'])->name('front.address.save');
+Route::post('/update-address', [AddressController::class, 'updateAddress'])->name('front.updateAddress');
+
 
 Route::post('/save-rating/{productId}',[FrontController::class,'saveRating'])->name('front.saveRating');
 
@@ -123,3 +127,14 @@ Route::get('/orders/{orderId}/download-pdf', [PdfController::class, 'downloadPdf
 Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('google-auth');
 Route::get('/auth/google/call-back', [GoogleController::class, 'callbackGoogle']);
 
+Route::get('/admin/options/create/{productId}', [OptionController::class, 'create'])->name('options.create');
+Route::post('/admin/options/store/{productId}', [OptionController::class, 'store'])->name('options.store');
+Route::put('/options/{id}', [OptionController::class, 'update'])->name('options.update');
+Route::delete('/options/{id}', [OptionController::class, 'destroy'])->name('options.destroy');
+
+
+Route::get('/admin/shipping/create',[ShippingController::class,'create'])->name('shipping.create');
+Route::post('/shipping/store', [ShippingController::class, 'store'])->name('shipping.store');
+Route::get('/shipping/edit/{id}', [ShippingController::class, 'edit'])->name('shipping.edit');
+Route::put('/shipping/update/{id}', [ShippingController::class, 'update'])->name('shipping.update');
+Route::delete('/shipping/destroy/{id}', [ShippingController::class, 'destroy'])->name('shipping.destroy');

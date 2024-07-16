@@ -20,7 +20,7 @@
                 </div>
             </div>
             @endif
-            <div class="col-md-10">
+            <div class="col-md-11">
                 <div class="card borde-0 shadow-1g my-4">
                     <div class="card-header bg-dark">
                         <h3 class="text-white">Orders</h3>
@@ -34,9 +34,12 @@
         <th>Address</th>
         <th>quantity</th>
         <th>total_amount</th>
+    
         <th>Created_at</th>
         <th>Status</th>
         <th>Gift_card_used</th>
+        <th>Shipping Option</th>
+        <th>Delivery Date</th>
         <th>Details</th>
         <!-- Add more columns as needed -->
     </tr>
@@ -48,6 +51,7 @@
         <td>{{$order->customer_address}}</td>
         <td>{{ $order->quantity }}</td>
         <td>{{ $order->total_amount }}</td>
+
         <td>{{$order->created_at}}</td>
         <td><form action="{{ route('order.status', $order->id) }}" method="post">
                 @csrf
@@ -62,6 +66,8 @@
             </form>
 </a></td>
 <td>{{$order->gift_cards_used}}</td>
+<td>{{$order->shipping_option}}</td>
+<td>{{$order->delivery_date}}</td>
         <td>
         <a class="btn btn-dark" href="{{ route('order.downloadPdf', ['orderId' => $order->id]) }}">Details</a>
         </td>

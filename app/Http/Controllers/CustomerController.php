@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class CustomerController extends Controller
 {
@@ -19,11 +21,32 @@ class CustomerController extends Controller
 
     public function authenticate(Request $request)
     {
+     
+       
         $validateData = $request->validate([
             'email' => 'required',
-            'password' => 'required'
+            'password' => 'required',
+            'g-recaptcha-response' => 'required'
         ]);
 
+
+        $recaptchaResponse = $request->input('g-recaptcha-response');
+        $secretKey = config('services.recaptcha.v3.secret_key');
+    
+        Log::info('reCAPTCHA Response: ' . $recaptchaResponse);
+        $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+            'secret' => $secretKey,
+            'response' => $recaptchaResponse,
+            'remoteip' => $request->ip()
+        ]);
+    
+        $result = $response->json();
+    
+        if (!$result['success'] || $result['score'] < 0.5) {
+            return back()->withErrors(['recaptcha' => 'reCAPTCHA verification failed, please try again.']);
+        }
+
+        Log::info('reCAPTCHA verification successful.');
         if ($validateData) {
            if (Auth::guard('customer')->attempt(['email' => $request->email, 'password' => $request->password])) {
               
@@ -67,7 +90,8 @@ public function logout()
     {
         $validateData = $request->validate([
             'email' => 'required',
-            'password' => 'required|confirmed'
+            'password' => 'required|confirmed',
+            'g-recaptcha-response'=>'recaptcha',
         ]);
 
         if ($validateData) {
@@ -75,6 +99,7 @@ public function logout()
             $customer->name = $request->name;
             $customer->email = $request->email;
             $customer->password = Hash::make($request->password); // Fix typo in $request->password
+            
             $customer->save();
 
             return redirect()->route('customer.login')->with('success', 'You have registered successfully');

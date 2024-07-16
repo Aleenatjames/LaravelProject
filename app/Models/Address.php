@@ -16,7 +16,8 @@ class Address extends Model
         'state',
         'pincode',
         'mobileno',
-        'customer_id'
+        'customer_id',
+        'address'
      
     ];
     use HasFactory;

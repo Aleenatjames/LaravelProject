@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Body Fitness</title>
+
+    {!!htmlScriptTagJsApi()!!}
+
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
@@ -83,6 +86,18 @@
                 </div>
                 <div class="form-group">
                     <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Confirm Password">
+                </div>
+                <div class="form-group mt-3">
+                    {!!htmlFormSnippet()!!}
+
+                    @if($errors->has('g-recaptcha-response'))
+                    <div>
+                        <small class="text-danger">
+                            {{($errors->first('g-recaptcha-response'))}}
+                        </small>
+                    </div>
+                    @endif
+
                 </div>
                 <button type="submit" class="btn btn-register">Register</button>
             </form>

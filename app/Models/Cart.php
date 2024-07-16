@@ -15,7 +15,8 @@ class Cart extends Model
         'quantity',
         'customer_id',
         'image',
-        'product_type'
+        'product_type',
+        'option',
      
     ];
     use HasFactory;
