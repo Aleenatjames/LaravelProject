@@ -131,7 +131,7 @@
                             <!-- Buttons for Orders and Change Password -->
                             <div class="mt-4">
                             <a href="{{ route('customer.logout') }}" class="btn btn- " id="color-button">Logout</a>
-                            <a href="{{ route('customer.orders') }}" class="btn btn-primary">Order Details</a>
+                            <a href="{{ route('customer.orders' , $customer->id) }}" class="btn btn-primary">Order Details</a>
                             <button type="button" class="btn btn-secondary ml-2" data-toggle="modal" data-target="#changePasswordModal">
                                     Change Password
                                 </button>

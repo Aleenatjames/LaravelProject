@@ -199,13 +199,11 @@ function sortProductsName(sortBy) {
                     
                    
                 </div>
-                <div class="col-sm">
+                <div class="col-sm-1">
                     <img src="{{(asset('front-assets/images/logo.png'))}}" class="logo">
                 </div>
-                <div class="col-sm">
-                    
-                </div>
-                <div class="col-sm">
+               
+                <div class="col-sm-1">
                     <div class="language-select" style="display: flex;">
                         <div class="flag-container">
                             <img src="{{(asset('front-assets/images/country.png'))}}" id="flag-image" class="flag" alt="Flag">
@@ -223,28 +221,29 @@ function sortProductsName(sortBy) {
                     </div>
                 </div>
          
-                <div class="col-sm">
+                <div class="col-sm col-md-12 col-lg-1">
                 <a href="{{ route('front.account') }}">
                     <img src="{{(asset('front-assets/images/account.png'))}}" class="account">
                 </a>
+                 @if(Auth::guard('customer')->check())
+                  <small id="p4">{{ Auth::guard('customer')->user()->name }}</small>
+                    @endif
                     <a href="{{ route('front.cart') }}">
                          <img src="{{ asset('front-assets/images/bag.png') }}" class="bag">
                      </a>
-
+                     <span id="p2">Bag</span>
                 <div class="vl">
                     
                 </div>
-                @if(Auth::guard('customer')->check())
-    <small id="p4">{{ Auth::guard('customer')->user()->name }}</small>
-@endif
-                <span id="p2">Bag</span>
-                </div>
+               
+              
+                
                 
             </div>
-        </div>
+       
 
                 
-        </div>
+        
     </header>
     <div class="container-fluid" id="con2">
     <div class="container" id="con3">

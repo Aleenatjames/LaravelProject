@@ -10,12 +10,15 @@ class Orders extends Model
     protected $table = 'orders';
     protected $fillable = [
         
-        'total_price',
+        'total_amount',
         'quantity',
         'customer_address',
         'customer_id',
         'customer_name',
-        'delivery_date'
+        'delivery_date',
+        'status',
+        'gift_cards_used',
+        'generated_by'
         
      
     ];

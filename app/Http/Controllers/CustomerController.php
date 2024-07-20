@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Address;
+use App\Models\Country;
 use App\Models\Customer;
 use App\Models\OrderItem;
 use App\Models\Orders;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -131,9 +134,12 @@ public function logout()
     // Redirect with success message
     return redirect()->route('front.account')->with('success', 'Password changed successfully.');
 }
-public function orderDetails()
+public function orderDetails($customerId)
 {
-    $orders = Orders::with('orderItems.product')->get();
+    $orders = Orders::with('orderItems.product')
+                    ->where('customer_id', $customerId)
+                    ->get();
+   
     return view('front.orders', compact('orders'));
 }
 
@@ -145,4 +151,54 @@ public function showOrders($orderId)
 
     return view('front.orders', compact('order'));
 }
+public function create()
+{
+    $countries = Country::all(); // Retrieve all countries for the dropdown
+    return view('admin.customer.create', compact('countries'));
+}
+public function store(Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:customer,email',
+            'mobile_number' => 'required|string|max:15',
+            'country_id' => 'required|exists:countries,id',
+            'address1' => 'required|string|max:255',
+            'address2' => 'nullable|string|max:255',
+            'city' => 'required|string|max:100',
+            'state' => 'required|string|max:100',
+            'pincode' => 'required|string|max:10',
+        ]);
+
+        // Create the customer
+        $customer = Customer::create([
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+        ]);
+
+        // Create the address
+        $address = Address::create([
+            'customer_id' => $customer->id,
+            'name' => $request->input('name'),
+            'country_id' => $request->input('country_id'),
+            'address1' => $request->input('address1'),
+            'address2' => $request->input('address2'),
+            'city' => $request->input('city'),
+            'state' => $request->input('state'),
+            'pincode' => $request->input('pincode'),
+            'mobileno' => $request->input('mobile_number'),
+        ]);
+
+        // Redirect with a success message
+        return back()->with('success', 'Customer created successfully');
+    }
+    public function select()
+{
+    $customers = Customer::with('address.country')->get();
+    return view('admin.customer.select', compact('customers'));
+}
+
+
+
 }

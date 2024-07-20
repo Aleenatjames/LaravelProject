@@ -83,7 +83,7 @@ class GiftCardController extends Controller
             'quantity' =>1,
         ]);
     
-        return redirect()->route('front.cart')->with('success', 'Gift Card added to cart successfully');
+        return redirect()->route('front.addToCart')->with('success', 'Gift Card added to cart successfully');
     }
     public function view(){
         return view('email.gift_card_confirmation');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
 use App\Models\Orders;
 use App\Models\Product;
 use App\Models\User;
@@ -50,4 +51,10 @@ class AdminController extends Controller
     return redirect()->route('admin.showChangePasswordForm')->with('success', 'Password changed successfully!');
 
 }
+public function listCustomers()
+{
+    $customers = Customer::with('address.country')->get();
+    return view('admin.customer.list', compact('customers'));
+}
+
 }

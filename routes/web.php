@@ -9,6 +9,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\AdminCategoriesController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\CustomerOrderController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\GiftCardController;
 use App\Http\Controllers\GoogleController;
@@ -26,9 +27,14 @@ Route::get('/register',[CustomerController::class,'register'])->name('customer.r
 Route::post('/customer/process-register',[CustomerController::class,'processRegister'])->name('customer.processRegister');
 Route::get('/customer/change-password', [CustomerController::class, 'showChangePasswordForm'])->name('customer.change-password');
 Route::post('/customer/change-password', [CustomerController::class, 'changePassword'])->name('customer.change-password.post');
-Route::get('/customer/orders', [CustomerController::class, 'orderDetails'])->name('customer.orders');
+Route::get('/customer/orders/{customerId}', [CustomerController::class, 'orderDetails'])->name('customer.orders');
+Route::get('/admin/customers/create', [CustomerController::class, 'create'])->name('admin.customers.create');
+Route::post('/admin/customers', [CustomerController::class, 'store'])->name('admin.customers.store');
+Route::get('/admin/customers/select', [CustomerController::class, 'select'])->name('admin.customers.select');
 
-
+Route::get('/admin/customers/selected/{customerId}', [CustomerOrderController::class, 'selectedCustomer'])->name('orders.CustomerSelected');
+Route::post('/admin/customers/addToCart', [CustomerOrderController::class, 'addToCart'])->name('cart.add');
+Route::post('/admin/customers/order/{customerId}', [CustomerOrderController::class, 'store'])->name('admin.orders.store');
 
 Route::get('send-email',[EmailController::class,'sendEmail'])->name('send.email');
 
@@ -83,6 +89,10 @@ Route::get('/giftcard',[GiftCardController::class,'view']);
 Route::post('/admin/change-password/store',[AdminController::class,'processChangePassword'])->name('admin.processChangePassword');
 Route::get('/admin/change-password',[AdminController::class,'showChangePasswordForm'])->name('admin.showChangePasswordForm');
 Route::get('/admin/dashboard',[AdminController::class,'index'])->name('admin.dashboard');
+Route::get('/admin/customers', [AdminController::class, 'listCustomers'])->name('admin.customers.list');
+
+
+
 Route::get('/admin/logout',[LoginController::class,'logout'])->name('admin.logout');
 
 

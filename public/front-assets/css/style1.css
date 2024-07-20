@@ -19,7 +19,7 @@
     width: 380px;
     height: 45px;
     position: relative;
-    right: -30px;
+    right: -0px;
     top: 20px;
     
     
@@ -40,14 +40,10 @@
 }
 #p4{
     position: relative;
-    top: -35px;
+    top: -5px;
     right: 40px;
 }
-#p2{
-    position: relative;
-    bottom: 60px;
-    right: -60px;
-}
+
 #i{
     position: relative;
     right: -380px;
@@ -57,7 +53,7 @@
 .logo{
     position: relative;
     top: 10px;
-    right: -40px;
+    right: -0px;
 }
    
 .language-select {
@@ -138,7 +134,7 @@
   .bag{
     position: relative;
     top: -30px;
-    left: 60px;
+    left: 10px;
   }
 .popular{
     text-align: left;
@@ -700,17 +696,7 @@ button{
     text-decoration: none;
     color:  rgb(102, 104, 105);;
 }
-.head-text{
-    border-radius: 25px;
-    border: 2px solid rgb(224, 224, 224);
-    width: 380px;
-    height: 45px;
-    position: relative;
-    right: -30px;
-    top: 20px;
-    
-    
-}
+
 /* #p3,#p2{
     position: absolute;
 } */
@@ -723,20 +709,16 @@ button{
 
 #p2{
     position: relative;
-    bottom: 60px;
+    bottom: 40px;
     right: -60px;
 }
 #i{
     position: relative;
-    right: -380px;
+    right: -340px;
     top: -15px;
     
 }
-.logo{
-    position: relative;
-    top: 10px;
-    right: -40px;
-}
+
    
 .language-select {
     position: relative;
@@ -828,7 +810,7 @@ button{
 .bag{
     position: relative;
     bottom: 30px;
-    right: -55px;
+    right: -5px;
 }
 #con2{
     padding-top: 20px;

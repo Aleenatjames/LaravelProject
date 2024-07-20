@@ -17,8 +17,17 @@ class Address extends Model
         'pincode',
         'mobileno',
         'customer_id',
-        'address'
+        'address',
+        'country_id'
      
     ];
     use HasFactory;
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
+    public function country()
+{
+    return $this->belongsTo(Country::class);
+}
 }

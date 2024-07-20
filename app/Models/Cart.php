@@ -17,6 +17,7 @@ class Cart extends Model
         'image',
         'product_type',
         'option',
+        'generated_by',
      
     ];
     use HasFactory;
@@ -24,4 +25,7 @@ class Cart extends Model
     {
         return $this->belongsTo(Product::class, 'product_id');
     }
+    protected $casts = [
+        'option' => 'array',
+    ];
 }

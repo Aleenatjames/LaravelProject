@@ -149,6 +149,7 @@
                                 @php
                                     $options = json_decode($cartItem->option, true);
                                 @endphp
+                                @if($cartItem->generated_by !== 'admin')
                                 <tr>
                                     <td>{{ $cartItem->name }}
                                         @if(!empty($options['size']))
@@ -170,6 +171,7 @@
                                     <td>{{ $cartItem->quantity }}</td>
                                     <td>${{ $cartItem->price * $cartItem->quantity }}</td>
                                 </tr>
+                                @endif
                                 @endforeach
                             </tbody>
                         </table>

@@ -196,9 +196,9 @@ class FrontController extends Controller
     }
 
     $cartItems = Cart::where('customer_id', $customerId)->get();
-
+    $giftCard = $cartItems->firstWhere('gift_card_id', '!=', null);
     // Pass cart items to the cart view and show success message
-    return view('front.cart', compact('cartItems', 'customer'))->with('success', 'Product added to cart successfully');
+    return view('front.cart', compact('cartItems', 'customer','giftCard'))->with('success', 'Product added to cart successfully');
 }
 
    
@@ -207,11 +207,11 @@ public function cart()
     $customerId = Auth::guard('customer')->id(); // Get the authenticated customer's ID
     $cartItems = Cart::where('customer_id', $customerId)->get();
     $customer = Auth::guard('customer')->user();
+    $giftCard = $cartItems->firstWhere('gift_card_id', '!=', null);
    
-    return view('front.cart', compact('cartItems','customer'));
+    return view('front.cart', compact('cartItems','customer','giftCard'));
 }
-        
-    
+         
 public function removeFromCart($id)
 {
     // Fetch the cart item based on its ID
@@ -245,7 +245,7 @@ public function account()
     $customerAddress = '';
 
     if ($customer->address) {
-        $customerAddress = $customer->address->address1 . ', ' . $customer->address->address2 . ', ' . $customer->address->city . ', ' . $customer->address->state . ', ' . $customer->address->country;
+        $customerAddress = $customer->address->address1 . ', ' . $customer->address->address2 . ', ' . $customer->address->city . ', ' . $customer->address->state . ', ' . $customer->address->country->name;
     }
 
     return view('front.account', compact('customerAddress', 'customer', 'orders'));
